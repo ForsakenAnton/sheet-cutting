@@ -27,3 +27,36 @@ export interface Project {
   parts: Part[];
   settings: Settings;
 }
+
+export interface PlacedPart {
+  partId: string;
+  colorIndex: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotated: boolean;
+}
+
+export interface SheetLayout {
+  parts: PlacedPart[];
+  usedArea: number;
+}
+
+export interface UnplacedPart {
+  partId: string;
+  count: number;
+  reason: 'oversize' | 'space';
+}
+
+export interface LayoutResult {
+  sheets: SheetLayout[];
+  placedCount: number;
+  totalCount: number;
+  unplaced: UnplacedPart[];
+  sheetArea: number;
+  usedArea: number;
+  wasteArea: number;
+  utilization: number;
+  rotatedByPart: Record<string, number>;
+}
