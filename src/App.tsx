@@ -1,6 +1,7 @@
-import type { Project, SheetSpec, Unit } from './types';
+import type { Part, Project, Settings, SheetSpec, Unit } from './types';
 import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
+import { PartsPanel } from './components/PartsPanel';
 import { usePersistentState } from './hooks/usePersistentState';
 import { useTheme } from './hooks/useTheme';
 import { DEFAULT_PROJECT, PROJECT_KEY } from './lib/project';
@@ -11,6 +12,14 @@ export default function App() {
 
   const updateSheet = (patch: Partial<SheetSpec>) => {
     setProject((current) => ({ ...current, sheet: { ...current.sheet, ...patch } }));
+  };
+
+  const updateSettings = (patch: Partial<Settings>) => {
+    setProject((current) => ({ ...current, settings: { ...current.settings, ...patch } }));
+  };
+
+  const updateParts = (parts: Part[]) => {
+    setProject((current) => ({ ...current, parts }));
   };
 
   const updateUnit = (unit: Unit) => {
@@ -36,6 +45,13 @@ export default function App() {
         <div className="row g-3">
           <div className="col-12 col-xl-3 vstack gap-3">
             <SheetPanel sheet={project.sheet} unit={project.unit} onChange={updateSheet} />
+            <PartsPanel
+              parts={project.parts}
+              unit={project.unit}
+              allowRotation={project.settings.allowRotation}
+              onChange={updateParts}
+              onRotationChange={(value) => updateSettings({ allowRotation: value })}
+            />
           </div>
         </div>
       </main>

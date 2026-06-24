@@ -16,6 +16,29 @@ body {
   font-weight: 600;
 }
 
+.legend-dot {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 50%;
+}
+
+.parts-table th,
+.parts-table td {
+  padding: 0.3rem 0.35rem;
+  vertical-align: middle;
+}
+
+.parts-table td:first-child,
+.parts-table th:first-child {
+  width: 2.5rem;
+}
+
+.parts-table input {
+  min-width: 4rem;
+}
+
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   opacity: 0.35;
