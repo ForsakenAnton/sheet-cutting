@@ -1,14 +1,18 @@
+import { useMemo } from 'react';
 import type { Part, Project, Settings, SheetSpec, Unit } from './types';
 import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
 import { PartsPanel } from './components/PartsPanel';
+import { LayoutView } from './components/LayoutView';
 import { usePersistentState } from './hooks/usePersistentState';
 import { useTheme } from './hooks/useTheme';
+import { computeLayout } from './lib/layout';
 import { DEFAULT_PROJECT, PROJECT_KEY } from './lib/project';
 
 export default function App() {
   const theme = useTheme();
   const [project, setProject] = usePersistentState<Project>(PROJECT_KEY, DEFAULT_PROJECT);
+  const result = useMemo(() => computeLayout(project), [project]);
 
   const updateSheet = (patch: Partial<SheetSpec>) => {
     setProject((current) => ({ ...current, sheet: { ...current.sheet, ...patch } }));
@@ -52,6 +56,10 @@ export default function App() {
               onChange={updateParts}
               onRotationChange={(value) => updateSettings({ allowRotation: value })}
             />
+          </div>
+
+          <div className="col-12 col-xl-9 vstack gap-3">
+            <LayoutView project={project} result={result} dark={theme.resolved === 'dark'} />
           </div>
         </div>
       </main>
