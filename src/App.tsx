@@ -4,6 +4,7 @@ import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
 import { PartsPanel } from './components/PartsPanel';
 import { LayoutView } from './components/LayoutView';
+import { CutList } from './components/CutList';
 import { usePersistentState } from './hooks/usePersistentState';
 import { useTheme } from './hooks/useTheme';
 import { computeLayout } from './lib/layout';
@@ -60,6 +61,7 @@ export default function App() {
 
           <div className="col-12 col-xl-9 vstack gap-3">
             <LayoutView project={project} result={result} dark={theme.resolved === 'dark'} />
+            <CutList project={project} result={result} />
           </div>
         </div>
       </main>
