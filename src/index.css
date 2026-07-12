@@ -69,6 +69,11 @@ body {
   flex: 0 0 auto;
 }
 
+.summary-row + .summary-row {
+  border-top: 1px solid var(--bs-border-color-translucent);
+  padding-top: 0.5rem;
+}
+
 .empty-state {
   border: 1px dashed var(--bs-border-color);
   border-radius: var(--bs-border-radius);
