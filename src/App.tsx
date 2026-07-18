@@ -6,6 +6,7 @@ import { PartsPanel } from './components/PartsPanel';
 import { LayoutView } from './components/LayoutView';
 import { CutList } from './components/CutList';
 import { SummaryPanel } from './components/SummaryPanel';
+import { SettingsPanel } from './components/SettingsPanel';
 import { usePersistentState } from './hooks/usePersistentState';
 import { useTheme } from './hooks/useTheme';
 import { computeLayout } from './lib/layout';
@@ -67,6 +68,11 @@ export default function App() {
 
           <div className="col-12 col-xl-3 vstack gap-3">
             <SummaryPanel project={project} result={result} />
+            <SettingsPanel
+              settings={project.settings}
+              unit={project.unit}
+              onChange={updateSettings}
+            />
           </div>
         </div>
       </main>
