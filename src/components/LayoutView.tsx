@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import type { LayoutResult, Project } from '../types';
 import { partColor } from '../lib/palette';
 import { formatArea, formatPercent, partSizeLabel } from '../lib/format';
@@ -7,6 +8,7 @@ interface Props {
   project: Project;
   result: LayoutResult;
   dark: boolean;
+  canvasRef: RefObject<HTMLDivElement | null>;
 }
 
 interface TileProps {
@@ -26,7 +28,7 @@ function Tile({ label, value, tone }: TileProps) {
   );
 }
 
-export function LayoutView({ project, result, dark }: Props) {
+export function LayoutView({ project, result, dark, canvasRef }: Props) {
   const { sheet, unit, parts } = project;
   const placedByPart = new Map<string, number>();
 
@@ -91,7 +93,7 @@ export function LayoutView({ project, result, dark }: Props) {
               </div>
             )}
 
-            <div className="vstack gap-4">
+            <div ref={canvasRef} className="vstack gap-4">
               {result.sheets.map((layout, index) => (
                 <div key={index}>
                   {result.sheets.length > 1 && (
