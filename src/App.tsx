@@ -36,6 +36,11 @@ export default function App() {
     setProject((current) => ({ ...current, unit }));
   };
 
+  const downloadPdf = async () => {
+    const { exportPdf } = await import('./lib/exportPdf');
+    exportPdf(project, result, 'cutting-plan.pdf');
+  };
+
   const newProject = () => {
     if (!window.confirm('Start a new project? Current sheet and parts will be reset.')) return;
     setProject({ ...DEFAULT_PROJECT, parts: DEFAULT_PROJECT.parts.map((part) => ({ ...part })) });
@@ -78,6 +83,7 @@ export default function App() {
             <SummaryPanel project={project} result={result} />
             <ActionsPanel
               disabled={result.sheets.length === 0}
+              onExportPdf={downloadPdf}
               onExportSvg={() => exportSvg(canvasRef.current, 'cutting-plan.svg')}
             />
             <SettingsPanel
