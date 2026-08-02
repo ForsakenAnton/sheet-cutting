@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Part, Project, Settings, SheetSpec, Unit } from './types';
 import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
@@ -19,6 +19,20 @@ export default function App() {
   const [project, setProject] = usePersistentState<Project>(PROJECT_KEY, DEFAULT_PROJECT);
   const result = useMemo(() => computeLayout(project), [project]);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [printing, setPrinting] = useState(false);
+
+  useEffect(() => {
+    if (!printing) {
+      document.documentElement.setAttribute('data-bs-theme', theme.resolved);
+      return;
+    }
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+    const timer = window.setTimeout(() => {
+      window.print();
+      setPrinting(false);
+    }, 100);
+    return () => window.clearTimeout(timer);
+  }, [printing, theme.resolved]);
 
   const updateSheet = (patch: Partial<SheetSpec>) => {
     setProject((current) => ({ ...current, sheet: { ...current.sheet, ...patch } }));
@@ -58,7 +72,7 @@ export default function App() {
 
       <main className="container-fluid py-3">
         <div className="row g-3">
-          <div className="col-12 col-xl-3 vstack gap-3">
+          <div className="col-12 col-xl-3 vstack gap-3 d-print-none">
             <SheetPanel sheet={project.sheet} unit={project.unit} onChange={updateSheet} />
             <PartsPanel
               parts={project.parts}
@@ -69,22 +83,23 @@ export default function App() {
             />
           </div>
 
-          <div className="col-12 col-xl-6 vstack gap-3">
+          <div className="col-12 col-xl-6 vstack gap-3 print-wide">
             <LayoutView
               project={project}
               result={result}
-              dark={theme.resolved === 'dark'}
+              dark={theme.resolved === 'dark' && !printing}
               canvasRef={canvasRef}
             />
             <CutList project={project} result={result} />
           </div>
 
-          <div className="col-12 col-xl-3 vstack gap-3">
+          <div className="col-12 col-xl-3 vstack gap-3 print-wide">
             <SummaryPanel project={project} result={result} />
             <ActionsPanel
               disabled={result.sheets.length === 0}
               onExportPdf={downloadPdf}
               onExportSvg={() => exportSvg(canvasRef.current, 'cutting-plan.svg')}
+              onPrint={() => setPrinting(true)}
             />
             <SettingsPanel
               settings={project.settings}

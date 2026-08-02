@@ -125,3 +125,25 @@ input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   opacity: 0.35;
 }
+
+@media print {
+  .print-wide {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border-color: #adb5bd !important;
+    break-inside: avoid;
+  }
+
+  .sheet-figure {
+    break-inside: avoid;
+  }
+
+  .sheet-svg {
+    max-height: none;
+  }
+}

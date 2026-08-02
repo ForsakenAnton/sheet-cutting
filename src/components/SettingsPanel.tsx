@@ -12,7 +12,7 @@ export function SettingsPanel({ settings, unit, onChange }: Props) {
   const step = UNITS[unit].step;
 
   return (
-    <div className="card shadow-sm">
+    <div className="card shadow-sm d-print-none">
       <div className="card-header bg-body-tertiary fw-semibold">Settings</div>
       <div className="card-body vstack gap-3">
         <div>
