@@ -63,7 +63,7 @@ export default function App() {
   };
 
   return (
-    <>
+    <div className="app-shell">
       <AppNavbar
         unit={project.unit}
         onUnitChange={updateUnit}
@@ -72,9 +72,9 @@ export default function App() {
         onNewProject={newProject}
       />
 
-      <main className="container-fluid py-3">
-        <div className="row g-3">
-          <div className="col-12 col-xl-3 vstack gap-3 d-print-none">
+      <main className="app-main container-fluid py-3">
+        <div className="row g-3 app-row">
+          <div className="col-12 col-xl-3 app-col vstack gap-3 d-print-none">
             <SheetPanel sheet={project.sheet} unit={project.unit} onChange={updateSheet} />
             <PartsPanel
               parts={project.parts}
@@ -85,7 +85,7 @@ export default function App() {
             />
           </div>
 
-          <div className="col-12 col-xl-6 vstack gap-3 print-wide">
+          <div className="col-12 col-xl-6 app-col vstack gap-3 print-wide">
             <LayoutView
               project={deferredProject}
               result={result}
@@ -96,7 +96,7 @@ export default function App() {
             <CutList project={deferredProject} result={result} />
           </div>
 
-          <div className="col-12 col-xl-3 vstack gap-3 print-wide">
+          <div className="col-12 col-xl-3 app-col vstack gap-3 print-wide">
             <SummaryPanel project={deferredProject} result={result} />
             <ActionsPanel
               disabled={result.sheets.length === 0}
@@ -112,6 +112,6 @@ export default function App() {
           </div>
         </div>
       </main>
-    </>
+    </div>
   );
 }
