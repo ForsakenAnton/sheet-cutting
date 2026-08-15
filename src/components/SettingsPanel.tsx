@@ -13,39 +13,34 @@ export function SettingsPanel({ settings, unit, onChange }: Props) {
 
   return (
     <div className="card shadow-sm d-print-none">
-      <div className="card-header bg-body-tertiary fw-semibold">Settings</div>
+      <div className="card-header bg-body-tertiary d-flex align-items-center gap-2">
+        <span className="step-badge">3</span>
+        <span className="fw-semibold">Settings</span>
+      </div>
       <div className="card-body vstack gap-3">
-        <div>
-          <label className="form-label" htmlFor="kerf">
-            Blade kerf
-          </label>
-          <NumberField
-            id="kerf"
-            value={settings.kerf}
-            min={0}
-            max={100}
-            step={step}
-            suffix={unit}
-            onChange={(value) => onChange({ kerf: value })}
-          />
-        </div>
+        <NumberField
+          id="kerf"
+          label="Blade kerf"
+          value={settings.kerf}
+          min={0}
+          max={100}
+          step={step}
+          suffix={unit}
+          onChange={(value) => onChange({ kerf: value })}
+        />
 
-        <div>
-          <label className="form-label" htmlFor="margin">
-            Edge margin
-          </label>
-          <NumberField
-            id="margin"
-            value={settings.margin}
-            min={0}
-            max={1000}
-            step={step}
-            suffix={unit}
-            onChange={(value) => onChange({ margin: value })}
-          />
-        </div>
+        <NumberField
+          id="margin"
+          label="Edge margin"
+          value={settings.margin}
+          min={0}
+          max={1000}
+          step={step}
+          suffix={unit}
+          onChange={(value) => onChange({ margin: value })}
+        />
 
-        <div className="form-check">
+        <div className="form-check mb-0">
           <input
             className="form-check-input"
             type="checkbox"

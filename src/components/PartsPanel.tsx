@@ -2,7 +2,7 @@ import type { Part, Unit } from '../types';
 import { createPart } from '../lib/project';
 import { partColor } from '../lib/palette';
 import { UNITS } from '../lib/units';
-import { NumberField } from './NumberField';
+import { NumberCell } from './NumberField';
 
 interface Props {
   parts: Part[];
@@ -41,7 +41,9 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
 
       <div className="card-body">
         {parts.length === 0 ? (
-          <p className="text-body-secondary small mb-3">No parts yet. Add the first one to start.</p>
+          <p className="text-body-secondary small mb-3">
+            No parts yet. Add the first one to start.
+          </p>
         ) : (
           <div className="table-responsive">
             <table className="table table-sm align-middle mb-2 parts-table">
@@ -78,8 +80,7 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
                       </span>
                     </td>
                     <td>
-                      <NumberField
-                        small
+                      <NumberCell
                         value={part.width}
                         min={1}
                         step={step}
@@ -88,8 +89,7 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
                       />
                     </td>
                     <td>
-                      <NumberField
-                        small
+                      <NumberCell
                         value={part.height}
                         min={1}
                         step={step}
@@ -98,8 +98,7 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
                       />
                     </td>
                     <td>
-                      <NumberField
-                        small
+                      <NumberCell
                         integer
                         value={part.qty}
                         min={1}

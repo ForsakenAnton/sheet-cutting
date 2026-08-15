@@ -3,19 +3,6 @@ body {
   background-color: var(--bs-body-bg);
 }
 
-.step-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  background-color: var(--bs-primary);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -49,6 +36,19 @@ body {
 .is-computing {
   opacity: 0.6;
   transition: opacity 0.15s ease-in;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: var(--bs-primary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .stat-tile {
@@ -104,16 +104,6 @@ body {
   flex: 0 0 auto;
 }
 
-.summary-row + .summary-row {
-  border-top: 1px solid var(--bs-border-color-translucent);
-  padding-top: 0.5rem;
-}
-
-.empty-state {
-  border: 1px dashed var(--bs-border-color);
-  border-radius: var(--bs-border-radius);
-}
-
 .legend-box {
   display: inline-block;
   width: 1rem;
@@ -154,6 +144,16 @@ body {
 
 .parts-table input {
   min-width: 4rem;
+}
+
+.summary-row + .summary-row {
+  border-top: 1px solid var(--bs-border-color-translucent);
+  padding-top: 0.5rem;
+}
+
+.empty-state {
+  border: 1px dashed var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
 }
 
 input[type='number']::-webkit-outer-spin-button,

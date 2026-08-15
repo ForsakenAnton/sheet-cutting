@@ -3,11 +3,11 @@ import type { Part, Project, Settings, SheetSpec, Unit } from './types';
 import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
 import { PartsPanel } from './components/PartsPanel';
+import { SettingsPanel } from './components/SettingsPanel';
+import { SummaryPanel } from './components/SummaryPanel';
+import { ActionsPanel } from './components/ActionsPanel';
 import { LayoutView } from './components/LayoutView';
 import { CutList } from './components/CutList';
-import { SummaryPanel } from './components/SummaryPanel';
-import { SettingsPanel } from './components/SettingsPanel';
-import { ActionsPanel } from './components/ActionsPanel';
 import { usePersistentState } from './hooks/usePersistentState';
 import { useTheme } from './hooks/useTheme';
 import { computeLayout } from './lib/layout';
@@ -17,11 +17,12 @@ import { exportSvg } from './lib/exportSvg';
 export default function App() {
   const theme = useTheme();
   const [project, setProject] = usePersistentState<Project>(PROJECT_KEY, DEFAULT_PROJECT);
+  const [printing, setPrinting] = useState(false);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
   const deferredProject = useDeferredValue(project);
   const result = useMemo(() => computeLayout(deferredProject), [deferredProject]);
   const computing = deferredProject !== project;
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [printing, setPrinting] = useState(false);
 
   useEffect(() => {
     if (!printing) {
@@ -52,14 +53,14 @@ export default function App() {
     setProject((current) => ({ ...current, unit }));
   };
 
-  const downloadPdf = async () => {
-    const { exportPdf } = await import('./lib/exportPdf');
-    exportPdf(deferredProject, result, 'cutting-plan.pdf');
-  };
-
   const newProject = () => {
     if (!window.confirm('Start a new project? Current sheet and parts will be reset.')) return;
     setProject({ ...DEFAULT_PROJECT, parts: DEFAULT_PROJECT.parts.map((part) => ({ ...part })) });
+  };
+
+  const downloadPdf = async () => {
+    const { exportPdf } = await import('./lib/exportPdf');
+    exportPdf(deferredProject, result, 'cutting-plan.pdf');
   };
 
   return (
@@ -83,6 +84,11 @@ export default function App() {
               onChange={updateParts}
               onRotationChange={(value) => updateSettings({ allowRotation: value })}
             />
+            <SettingsPanel
+              settings={project.settings}
+              unit={project.unit}
+              onChange={updateSettings}
+            />
           </div>
 
           <div className="col-12 col-xl-6 app-col vstack gap-3 print-wide">
@@ -103,11 +109,6 @@ export default function App() {
               onExportPdf={downloadPdf}
               onExportSvg={() => exportSvg(canvasRef.current, 'cutting-plan.svg')}
               onPrint={() => setPrinting(true)}
-            />
-            <SettingsPanel
-              settings={project.settings}
-              unit={project.unit}
-              onChange={updateSettings}
             />
           </div>
         </div>

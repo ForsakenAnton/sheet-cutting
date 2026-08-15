@@ -19,52 +19,41 @@ export function SheetPanel({ sheet, unit, onChange }: Props) {
         <span className="fw-semibold">Sheet</span>
       </div>
       <div className="card-body vstack gap-3">
-        <div>
-          <label className="form-label" htmlFor="sheet-width">
-            Width
-          </label>
-          <NumberField
-            id="sheet-width"
-            value={sheet.width}
-            min={1}
-            step={step}
-            suffix={unit}
-            onChange={(value) => onChange({ width: value })}
-          />
-        </div>
+        <NumberField
+          id="sheet-width"
+          label="Width"
+          value={sheet.width}
+          min={1}
+          step={step}
+          suffix={unit}
+          onChange={(value) => onChange({ width: value })}
+        />
 
-        <div>
-          <label className="form-label" htmlFor="sheet-height">
-            Height
-          </label>
-          <NumberField
-            id="sheet-height"
-            value={sheet.height}
-            min={1}
-            step={step}
-            suffix={unit}
-            onChange={(value) => onChange({ height: value })}
-          />
-        </div>
+        <NumberField
+          id="sheet-height"
+          label="Height"
+          value={sheet.height}
+          min={1}
+          step={step}
+          suffix={unit}
+          onChange={(value) => onChange({ height: value })}
+        />
 
-        <div>
-          <label className="form-label" htmlFor="sheet-thickness">
-            Thickness <span className="text-body-secondary fw-normal">(optional)</span>
-          </label>
-          <NumberField
-            id="sheet-thickness"
-            value={sheet.thickness}
-            min={0}
-            step={step}
-            suffix={unit}
-            onChange={(value) => onChange({ thickness: value })}
-          />
-        </div>
+        <NumberField
+          id="sheet-thickness"
+          label={
+            <>
+              Thickness <span className="text-body-secondary">(optional)</span>
+            </>
+          }
+          value={sheet.thickness}
+          min={0}
+          step={step}
+          suffix={unit}
+          onChange={(value) => onChange({ thickness: value })}
+        />
 
-        <div>
-          <label className="form-label" htmlFor="sheet-material">
-            Material
-          </label>
+        <div className="form-floating">
           <select
             id="sheet-material"
             className="form-select"
@@ -77,6 +66,7 @@ export function SheetPanel({ sheet, unit, onChange }: Props) {
               </option>
             ))}
           </select>
+          <label htmlFor="sheet-material">Material</label>
         </div>
       </div>
     </div>

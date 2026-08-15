@@ -116,7 +116,13 @@ export function LayoutView({ project, result, computing, dark, canvasRef }: Prop
                       </span>
                     </div>
                   )}
-                  <SheetCanvas layout={layout} sheet={sheet} unit={unit} index={index} dark={dark} />
+                  <SheetCanvas
+                    layout={layout}
+                    sheet={sheet}
+                    unit={unit}
+                    index={index}
+                    dark={dark}
+                  />
                 </div>
               ))}
             </div>
