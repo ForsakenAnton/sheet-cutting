@@ -16,6 +16,11 @@ body {
   font-weight: 600;
 }
 
+.is-computing {
+  opacity: 0.6;
+  transition: opacity 0.15s ease-in;
+}
+
 .stat-tile {
   padding: 0.5rem 0.25rem;
   border-right: 1px solid var(--bs-border-color);

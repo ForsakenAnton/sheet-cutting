@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import type { Part, Project, Settings, SheetSpec, Unit } from './types';
 import { AppNavbar } from './components/AppNavbar';
 import { SheetPanel } from './components/SheetPanel';
@@ -17,7 +17,9 @@ import { exportSvg } from './lib/exportSvg';
 export default function App() {
   const theme = useTheme();
   const [project, setProject] = usePersistentState<Project>(PROJECT_KEY, DEFAULT_PROJECT);
-  const result = useMemo(() => computeLayout(project), [project]);
+  const deferredProject = useDeferredValue(project);
+  const result = useMemo(() => computeLayout(deferredProject), [deferredProject]);
+  const computing = deferredProject !== project;
   const canvasRef = useRef<HTMLDivElement>(null);
   const [printing, setPrinting] = useState(false);
 
@@ -52,7 +54,7 @@ export default function App() {
 
   const downloadPdf = async () => {
     const { exportPdf } = await import('./lib/exportPdf');
-    exportPdf(project, result, 'cutting-plan.pdf');
+    exportPdf(deferredProject, result, 'cutting-plan.pdf');
   };
 
   const newProject = () => {
@@ -85,16 +87,17 @@ export default function App() {
 
           <div className="col-12 col-xl-6 vstack gap-3 print-wide">
             <LayoutView
-              project={project}
+              project={deferredProject}
               result={result}
+              computing={computing}
               dark={theme.resolved === 'dark' && !printing}
               canvasRef={canvasRef}
             />
-            <CutList project={project} result={result} />
+            <CutList project={deferredProject} result={result} />
           </div>
 
           <div className="col-12 col-xl-3 vstack gap-3 print-wide">
-            <SummaryPanel project={project} result={result} />
+            <SummaryPanel project={deferredProject} result={result} />
             <ActionsPanel
               disabled={result.sheets.length === 0}
               onExportPdf={downloadPdf}

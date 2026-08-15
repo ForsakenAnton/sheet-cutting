@@ -7,6 +7,7 @@ import { SheetCanvas } from './SheetCanvas';
 interface Props {
   project: Project;
   result: LayoutResult;
+  computing: boolean;
   dark: boolean;
   canvasRef: RefObject<HTMLDivElement | null>;
 }
@@ -28,7 +29,7 @@ function Tile({ label, value, tone }: TileProps) {
   );
 }
 
-export function LayoutView({ project, result, dark, canvasRef }: Props) {
+export function LayoutView({ project, result, computing, dark, canvasRef }: Props) {
   const { sheet, unit, parts } = project;
   const placedByPart = new Map<string, number>();
 
@@ -40,9 +41,17 @@ export function LayoutView({ project, result, dark, canvasRef }: Props) {
 
   return (
     <div className="card shadow-sm">
-      <div className="card-header bg-body-tertiary fw-semibold">Layout Result</div>
+      <div className="card-header bg-body-tertiary d-flex align-items-center gap-2">
+        <span className="fw-semibold">Layout Result</span>
+        {computing && (
+          <span className="d-inline-flex align-items-center gap-2 small text-body-secondary d-print-none">
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+            Updating…
+          </span>
+        )}
+      </div>
 
-      <div className="card-body">
+      <div className={`card-body ${computing ? 'is-computing' : ''}`}>
         {result.sheets.length === 0 ? (
           <div className="empty-state text-center text-body-secondary py-5">
             <i className="bi bi-grid-3x3-gap fs-1 d-block mb-3 opacity-50" />
