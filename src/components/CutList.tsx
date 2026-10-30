@@ -1,6 +1,6 @@
 import type { LayoutResult, Project } from '../types';
-import { partColor } from '../lib/palette';
 import { formatArea, formatLength } from '../lib/format';
+import { PartSwatch } from './PartSwatch';
 
 interface Props {
   project: Project;
@@ -14,13 +14,17 @@ export function CutList({ project, result }: Props) {
   const rotatedByPart = result.rotatedByPart;
   const totalCount = parts.reduce((sum, part) => sum + part.qty, 0);
   const totalArea = parts.reduce((sum, part) => sum + part.width * part.height * part.qty, 0);
+  const totalPerimeter = parts.reduce(
+    (sum, part) => sum + (part.width + part.height) * 2 * part.qty,
+    0,
+  );
 
   return (
     <div className="card shadow-sm">
       <div className="card-header bg-body-tertiary fw-semibold">Cut List</div>
       <div className="card-body">
         <div className="table-responsive">
-          <table className="table table-sm align-middle mb-0">
+          <table className="table table-sm align-middle mb-0 text-nowrap">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -39,15 +43,11 @@ export function CutList({ project, result }: Props) {
             <tbody>
               {parts.map((part, index) => {
                 const rotated = rotatedByPart[part.id] ?? 0;
-                const color = partColor(index);
                 return (
                   <tr key={part.id}>
                     <td>
                       <span className="d-inline-flex align-items-center gap-2">
-                        <span
-                          className="legend-dot"
-                          style={{ background: color.fill, borderColor: color.stroke }}
-                        />
+                        <PartSwatch index={index} />
                         {index + 1}
                       </span>
                     </td>
@@ -77,7 +77,9 @@ export function CutList({ project, result }: Props) {
                 <td>{totalCount}</td>
                 <td />
                 <td className="text-end">{formatArea(totalArea, unit)}</td>
-                <td />
+                <td className="text-end">
+                  {formatLength(totalPerimeter, unit)} {unit}
+                </td>
               </tr>
             </tfoot>
           </table>

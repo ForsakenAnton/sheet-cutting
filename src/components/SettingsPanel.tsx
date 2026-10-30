@@ -1,6 +1,5 @@
 import type { Settings, Unit } from '../types';
-import { UNITS } from '../lib/units';
-import { NumberField } from './NumberField';
+import { LengthField } from './NumberField';
 
 interface Props {
   settings: Settings;
@@ -9,8 +8,6 @@ interface Props {
 }
 
 export function SettingsPanel({ settings, unit, onChange }: Props) {
-  const step = UNITS[unit].step;
-
   return (
     <div className="card shadow-sm d-print-none">
       <div className="card-header bg-body-tertiary d-flex align-items-center gap-2">
@@ -18,25 +15,23 @@ export function SettingsPanel({ settings, unit, onChange }: Props) {
         <span className="fw-semibold">Settings</span>
       </div>
       <div className="card-body vstack gap-3">
-        <NumberField
+        <LengthField
           id="kerf"
           label="Blade kerf"
           value={settings.kerf}
-          min={0}
+          unit={unit}
+          allowZero
           max={100}
-          step={step}
-          suffix={unit}
           onChange={(value) => onChange({ kerf: value })}
         />
 
-        <NumberField
+        <LengthField
           id="margin"
           label="Edge margin"
           value={settings.margin}
-          min={0}
+          unit={unit}
+          allowZero
           max={1000}
-          step={step}
-          suffix={unit}
           onChange={(value) => onChange({ margin: value })}
         />
 

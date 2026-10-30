@@ -1,6 +1,10 @@
+import { useCallback, useState } from 'react';
 import type { Unit } from '../types';
 import type { ThemeChoice } from '../hooks/useTheme';
+import { hasDonate } from '../donate';
 import { UNITS, UNIT_LIST } from '../lib/units';
+import { CoffeeIcon } from './CoffeeIcon';
+import { DonateDialog } from './DonateDialog';
 
 interface Props {
   unit: Unit;
@@ -17,15 +21,33 @@ const THEME_OPTIONS: { value: ThemeChoice; icon: string; title: string }[] = [
 ];
 
 export function AppNavbar({ unit, onUnitChange, theme, onThemeChange, onNewProject }: Props) {
+  const [donateOpen, setDonateOpen] = useState(false);
+  const closeDonate = useCallback(() => setDonateOpen(false), []);
+
   return (
     <nav className="navbar bg-body-tertiary border-bottom sticky-top d-print-none">
       <div className="container-fluid gap-2 flex-nowrap">
-        <span className="navbar-brand d-flex align-items-center gap-2 mb-0">
+        <span className="navbar-brand app-brand d-flex align-items-center gap-2 mb-0">
           <i className="bi bi-rulers fs-4 text-primary" />
-          <span className="fw-semibold text-truncate">Sheet Cutting Planner</span>
+          <span className="fw-semibold text-truncate d-none d-sm-inline">
+            Sheet Cutting Planner
+          </span>
         </span>
 
         <div className="d-flex align-items-center gap-2">
+          {hasDonate && (
+            <button
+              type="button"
+              className="donate-button"
+              title="Buy me a coffee"
+              aria-label="Buy me a coffee"
+              onClick={() => setDonateOpen(true)}
+            >
+              <CoffeeIcon size={20} steam />
+              <span className="donate-label">Buy me a coffee</span>
+            </button>
+          )}
+
           <label
             className="d-none d-md-inline text-body-secondary small mb-0"
             htmlFor="unit-select"
@@ -51,6 +73,7 @@ export function AppNavbar({ unit, onUnitChange, theme, onThemeChange, onNewProje
                 key={option.value}
                 type="button"
                 title={option.title}
+                aria-label={option.title}
                 aria-pressed={theme === option.value}
                 className={`btn ${theme === option.value ? 'btn-secondary' : 'btn-outline-secondary'}`}
                 onClick={() => onThemeChange(option.value)}
@@ -63,6 +86,8 @@ export function AppNavbar({ unit, onUnitChange, theme, onThemeChange, onNewProje
           <button
             type="button"
             className="btn btn-sm btn-primary text-nowrap"
+            title="New Project"
+            aria-label="New Project"
             onClick={onNewProject}
           >
             <i className="bi bi-file-earmark-plus me-1" />
@@ -70,6 +95,7 @@ export function AppNavbar({ unit, onUnitChange, theme, onThemeChange, onNewProje
           </button>
         </div>
       </div>
+      {donateOpen && <DonateDialog onClose={closeDonate} />}
     </nav>
   );
 }

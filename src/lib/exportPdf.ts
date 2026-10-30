@@ -1,16 +1,84 @@
-import { jsPDF } from 'jspdf';
+import { GState, jsPDF } from 'jspdf';
 import type { LayoutResult, Project } from '../types';
-import { partColor } from './palette';
-import { formatArea, formatLength, formatPercent, partSizeLabel } from './format';
+import type { PartTexture } from './palette';
+import { LABEL_COLOR, TEXTURE_OPACITY, partStyle } from './palette';
+import {
+  UNPLACED_REASONS,
+  formatArea,
+  formatLength,
+  formatPercent,
+  partSizeLabel,
+  pieceCount,
+} from './format';
 
 const PT_TO_MM = 0.352778;
+const ROW_HEIGHT = 6;
+const SWATCH_SIZE = 3;
+
+interface Row {
+  partIndex: number;
+  cells: string[];
+}
+
+function drawTexture(
+  doc: jsPDF,
+  texture: PartTexture,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  spacing: number,
+): void {
+  if (texture === 'none') return;
+  const step = spacing * Math.SQRT2;
+
+  doc.saveGraphicsState();
+  doc.setGState(new GState({ 'stroke-opacity': TEXTURE_OPACITY }));
+  doc.setDrawColor(LABEL_COLOR);
+  doc.setLineWidth(spacing / 8);
+
+  if (texture !== 'backward') {
+    for (let c = x + y + step / 2; c < x + w + y + h; c += step) {
+      const from = Math.max(x, c - y - h);
+      const to = Math.min(x + w, c - y);
+      if (to > from) doc.line(from, c - from, to, c - to);
+    }
+  }
+
+  if (texture !== 'forward') {
+    for (let d = y - x - w + step / 2; d < y + h - x; d += step) {
+      const from = Math.max(x, y - d);
+      const to = Math.min(x + w, y + h - d);
+      if (to > from) doc.line(from, from + d, to, to + d);
+    }
+  }
+
+  doc.restoreGraphicsState();
+}
+
+function drawPart(
+  doc: jsPDF,
+  partIndex: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  spacing: number,
+): void {
+  const style = partStyle(partIndex);
+  doc.setLineWidth(0.2);
+  doc.setFillColor(style.fill);
+  doc.setDrawColor(style.stroke);
+  doc.rect(x, y, w, h, 'FD');
+  drawTexture(doc, style.texture, x, y, w, h, spacing);
+}
 
 export function exportPdf(project: Project, result: LayoutResult, filename: string): void {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 14;
-  const { sheet, unit } = project;
+  const { sheet, unit, parts } = project;
   const sheetArea = sheet.width * sheet.height;
 
   result.sheets.forEach((layout, index) => {
@@ -45,17 +113,13 @@ export function exportPdf(project: Project, result: LayoutResult, filename: stri
     doc.setLineWidth(0.4);
     doc.rect(x0, y0, width, height, 'FD');
 
-    doc.setLineWidth(0.2);
     layout.parts.forEach((part) => {
-      const color = partColor(part.colorIndex);
       const px = x0 + part.x * scale;
       const py = y0 + part.y * scale;
       const pw = part.width * scale;
       const ph = part.height * scale;
 
-      doc.setFillColor(color.fill);
-      doc.setDrawColor(color.stroke);
-      doc.rect(px, py, pw, ph, 'FD');
+      drawPart(doc, part.colorIndex, px, py, pw, ph, 1.6);
 
       const label = partSizeLabel(part.width, part.height, unit);
       doc.setFontSize(10);
@@ -64,7 +128,7 @@ export function exportPdf(project: Project, result: LayoutResult, filename: stri
 
       if (size >= 4) {
         doc.setFontSize(size);
-        doc.setTextColor('#1b1f23');
+        doc.setTextColor(LABEL_COLOR);
         doc.text(label, px + pw / 2, py + ph / 2, { align: 'center', baseline: 'middle' });
       }
     });
@@ -74,9 +138,8 @@ export function exportPdf(project: Project, result: LayoutResult, filename: stri
     doc.text(`${formatLength(sheet.width, unit)} ${unit}`, x0 + width / 2, y0 - 2.5, {
       align: 'center',
     });
-    doc.text(`${formatLength(sheet.height, unit)} ${unit}`, x0 - 3, y0 + height / 2, {
-      align: 'center',
-      baseline: 'middle',
+    const heightLabel = `${formatLength(sheet.height, unit)} ${unit}`;
+    doc.text(heightLabel, x0 - 2.5, y0 + height / 2 + doc.getTextWidth(heightLabel) / 2, {
       angle: 90,
     });
   });
@@ -84,13 +147,46 @@ export function exportPdf(project: Project, result: LayoutResult, filename: stri
   doc.addPage();
   let y = margin;
 
-  doc.setFontSize(14);
-  doc.setTextColor('#111111');
-  doc.text('Summary', margin, y);
-  y += 8;
+  const heading = (title: string) => {
+    if (y + 8 + ROW_HEIGHT * 3 > pageH - margin) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.setFontSize(14);
+    doc.setTextColor('#111111');
+    doc.text(title, margin, y);
+    y += 8;
+  };
 
+  const table = (columns: number[], headers: string[], rows: Row[]) => {
+    const header = () => {
+      doc.setFontSize(9);
+      doc.setTextColor('#666666');
+      headers.forEach((text, column) => doc.text(text, margin + columns[column], y));
+      y += 2;
+      doc.setDrawColor('#cccccc');
+      doc.setLineWidth(0.2);
+      doc.line(margin, y, margin + 160, y);
+      y += 5;
+    };
+
+    header();
+    rows.forEach((row) => {
+      if (y > pageH - margin) {
+        doc.addPage();
+        y = margin;
+        header();
+      }
+      drawPart(doc, row.partIndex, margin, y - 2.6, SWATCH_SIZE, SWATCH_SIZE, 0.8);
+      doc.setFontSize(9);
+      doc.setTextColor('#111111');
+      row.cells.forEach((text, column) => doc.text(text, margin + columns[column], y));
+      y += ROW_HEIGHT;
+    });
+  };
+
+  heading('Summary');
   doc.setFontSize(10);
-  doc.setTextColor('#333333');
   const summary = [
     [
       'Sheet size',
@@ -116,45 +212,52 @@ export function exportPdf(project: Project, result: LayoutResult, filename: stri
     doc.text(label, margin, y);
     doc.setTextColor('#111111');
     doc.text(value, margin + 45, y);
-    y += 6;
+    y += ROW_HEIGHT;
   });
 
-  y += 6;
-  doc.setFontSize(14);
-  doc.setTextColor('#111111');
-  doc.text('Cut List', margin, y);
-  y += 8;
-
-  const columns = [margin, margin + 14, margin + 44, margin + 74, margin + 94, margin + 124];
-  const headers = ['#', 'Width', 'Height', 'Qty', 'Rotated', 'Area'];
-
-  doc.setFontSize(9);
-  doc.setTextColor('#666666');
-  headers.forEach((header, index) => doc.text(header, columns[index], y));
-  y += 2;
-  doc.setDrawColor('#cccccc');
-  doc.setLineWidth(0.2);
-  doc.line(margin, y, margin + 160, y);
-  y += 5;
-
-  doc.setTextColor('#111111');
-  project.parts.forEach((part, index) => {
-    if (y > pageH - margin) {
-      doc.addPage();
-      y = margin;
-    }
-    const rotated = result.rotatedByPart[part.id] ?? 0;
-    const row = [
-      String(index + 1),
-      `${formatLength(part.width, unit)} ${unit}`,
-      `${formatLength(part.height, unit)} ${unit}`,
-      String(part.qty),
-      rotated > 0 ? `${rotated} × 90°` : '0°',
-      formatArea(part.width * part.height * part.qty, unit),
+  const unplacedRows = result.unplaced.flatMap((item): Row[] => {
+    const partIndex = parts.findIndex((part) => part.id === item.partId);
+    if (partIndex < 0) return [];
+    const part = parts[partIndex];
+    return [
+      {
+        partIndex,
+        cells: [
+          String(partIndex + 1),
+          `${partSizeLabel(part.width, part.height, unit)} ${unit}`,
+          pieceCount(item.count),
+          UNPLACED_REASONS[item.reason],
+        ],
+      },
     ];
-    row.forEach((cell, cellIndex) => doc.text(cell, columns[cellIndex], y));
-    y += 6;
   });
+
+  if (unplacedRows.length > 0) {
+    y += ROW_HEIGHT;
+    heading('Not placed');
+    table([5, 16, 56, 76], ['#', 'Size', 'Qty', 'Reason'], unplacedRows);
+  }
+
+  y += ROW_HEIGHT;
+  heading('Cut List');
+  table(
+    [5, 16, 46, 76, 96, 126],
+    ['#', 'Width', 'Height', 'Qty', 'Rotated', 'Area'],
+    parts.map((part, partIndex) => {
+      const rotated = result.rotatedByPart[part.id] ?? 0;
+      return {
+        partIndex,
+        cells: [
+          String(partIndex + 1),
+          `${formatLength(part.width, unit)} ${unit}`,
+          `${formatLength(part.height, unit)} ${unit}`,
+          String(part.qty),
+          rotated > 0 ? `${rotated} × 90°` : '0°',
+          formatArea(part.width * part.height * part.qty, unit),
+        ],
+      };
+    }),
+  );
 
   doc.save(filename);
 }

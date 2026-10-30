@@ -7,7 +7,7 @@ function download(content: string, filename: string, type: string): void {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function exportSvg(container: HTMLElement | null, filename: string): void {
@@ -34,7 +34,7 @@ export function exportSvg(container: HTMLElement | null, filename: string): void
     .join('\n');
 
   const height = Math.max(offset - gap, 1);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n${body}\n</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}mm" height="${height}mm" viewBox="0 0 ${width} ${height}">\n${body}\n</svg>`;
 
   download(svg, filename, 'image/svg+xml;charset=utf-8');
 }

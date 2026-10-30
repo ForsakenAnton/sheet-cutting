@@ -2,8 +2,8 @@ import type { LayoutResult, PlacedPart, Project, SheetLayout, UnplacedPart } fro
 import { MaxRectsBin } from './packer';
 import type { Heuristic } from './packer';
 
-const MAX_SHEETS = 60;
-const MAX_PIECES = 2000;
+export const MAX_SHEETS = 60;
+export const MAX_PIECES = 2000;
 const HEURISTICS: Heuristic[] = ['bssf', 'baf', 'blsf', 'bl'];
 const ORDERS = ['area', 'maxSide', 'height', 'width'] as const;
 
@@ -20,18 +20,21 @@ interface Attempt extends LayoutResult {
   compactness: number;
 }
 
-function expand(project: Project): Piece[] {
+function expand(project: Project): { pieces: Piece[]; skipped: UnplacedPart[] } {
   const pieces: Piece[] = [];
+  const skipped: UnplacedPart[] = [];
 
   project.parts.forEach((part, colorIndex) => {
     if (part.width <= 0 || part.height <= 0) return;
-    const qty = Math.min(Math.max(Math.floor(part.qty), 0), MAX_PIECES);
-    for (let i = 0; i < qty && pieces.length < MAX_PIECES; i++) {
+    const qty = Math.max(Math.floor(part.qty), 0);
+    const taken = Math.min(qty, MAX_PIECES - pieces.length);
+    for (let i = 0; i < taken; i++) {
       pieces.push({ partId: part.id, colorIndex, width: part.width, height: part.height });
     }
+    if (taken < qty) skipped.push({ partId: part.id, count: qty - taken, reason: 'limit' });
   });
 
-  return pieces;
+  return { pieces, skipped };
 }
 
 function sortPieces(pieces: Piece[], order: Order): Piece[] {
@@ -167,13 +170,13 @@ function better(candidate: Attempt, current: Attempt): boolean {
 }
 
 export function computeLayout(project: Project): LayoutResult {
-  const pieces = expand(project);
+  const { pieces, skipped } = expand(project);
 
-  if (pieces.length === 0 || project.sheet.width <= 0 || project.sheet.height <= 0) {
+  if (pieces.length === 0) {
     return {
       sheets: [],
       placedCount: 0,
-      totalCount: pieces.length,
+      totalCount: 0,
       unplaced: [],
       sheetArea: 0,
       usedArea: 0,
@@ -188,15 +191,18 @@ export function computeLayout(project: Project): LayoutResult {
   const heuristics: Heuristic[] = HEURISTICS.slice(0, depth);
   const orders: Order[] = ORDERS.slice(0, depth);
 
-  let best = packOnce(sortPieces(pieces, orders[0]), project, heuristics[0]);
-
-  for (const order of orders) {
+  const attempts = orders.flatMap((order) => {
     const sorted = sortPieces(pieces, order);
-    for (const heuristic of heuristics) {
-      const attempt = packOnce(sorted, project, heuristic);
-      if (better(attempt, best)) best = attempt;
-    }
-  }
+    return heuristics.map((heuristic) => packOnce(sorted, project, heuristic));
+  });
+  const best = attempts.reduce((current, attempt) =>
+    better(attempt, current) ? attempt : current,
+  );
+  const skippedCount = skipped.reduce((sum, item) => sum + item.count, 0);
 
-  return best;
+  return {
+    ...best,
+    totalCount: best.totalCount + skippedCount,
+    unplaced: best.unplaced.concat(skipped),
+  };
 }

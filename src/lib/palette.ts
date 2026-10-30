@@ -1,9 +1,12 @@
-export interface PartColor {
+export type PartTexture = 'none' | 'forward' | 'backward' | 'cross';
+
+export interface PartStyle {
   fill: string;
   stroke: string;
+  texture: PartTexture;
 }
 
-export const PART_COLORS: PartColor[] = [
+const PART_COLORS = [
   { fill: '#a8c7fa', stroke: '#3b6fd4' },
   { fill: '#a9dfb5', stroke: '#3f9a55' },
   { fill: '#ffd08a', stroke: '#d68a17' },
@@ -16,20 +19,19 @@ export const PART_COLORS: PartColor[] = [
   { fill: '#c2c9d4', stroke: '#6c757d' },
 ];
 
-export function partColor(index: number): PartColor {
-  return PART_COLORS[index % PART_COLORS.length];
+const TEXTURES: PartTexture[] = ['none', 'forward', 'backward', 'cross'];
+
+export function partStyle(index: number): PartStyle {
+  const color = PART_COLORS[index % PART_COLORS.length];
+  const texture = TEXTURES[Math.floor(index / PART_COLORS.length) % TEXTURES.length];
+  return { ...color, texture };
 }
 
 export const LABEL_COLOR = '#1b1f23';
+export const TEXTURE_OPACITY = 0.3;
 
-export interface CanvasTheme {
-  paper: string;
-  border: string;
-  hatch: string;
-}
-
-export function canvasTheme(dark: boolean): CanvasTheme {
-  return dark
-    ? { paper: '#2b3035', border: '#6c757d', hatch: '#495057' }
-    : { paper: '#f1f3f5', border: '#6c757d', hatch: '#ced4da' };
-}
+export const SHEET_COLORS = {
+  paper: '#f1f3f5',
+  hatch: '#ced4da',
+  border: '#6c757d',
+};

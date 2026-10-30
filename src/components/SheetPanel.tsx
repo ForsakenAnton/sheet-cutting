@@ -1,7 +1,6 @@
 import type { SheetSpec, Unit } from '../types';
 import { MATERIALS } from '../lib/project';
-import { UNITS } from '../lib/units';
-import { NumberField } from './NumberField';
+import { LengthField } from './NumberField';
 
 interface Props {
   sheet: SheetSpec;
@@ -10,8 +9,6 @@ interface Props {
 }
 
 export function SheetPanel({ sheet, unit, onChange }: Props) {
-  const step = UNITS[unit].step;
-
   return (
     <div className="card shadow-sm">
       <div className="card-header bg-body-tertiary d-flex align-items-center gap-2">
@@ -19,27 +16,23 @@ export function SheetPanel({ sheet, unit, onChange }: Props) {
         <span className="fw-semibold">Sheet</span>
       </div>
       <div className="card-body vstack gap-3">
-        <NumberField
+        <LengthField
           id="sheet-width"
           label="Width"
           value={sheet.width}
-          min={1}
-          step={step}
-          suffix={unit}
+          unit={unit}
           onChange={(value) => onChange({ width: value })}
         />
 
-        <NumberField
+        <LengthField
           id="sheet-height"
           label="Height"
           value={sheet.height}
-          min={1}
-          step={step}
-          suffix={unit}
+          unit={unit}
           onChange={(value) => onChange({ height: value })}
         />
 
-        <NumberField
+        <LengthField
           id="sheet-thickness"
           label={
             <>
@@ -47,9 +40,8 @@ export function SheetPanel({ sheet, unit, onChange }: Props) {
             </>
           }
           value={sheet.thickness}
-          min={0}
-          step={step}
-          suffix={unit}
+          unit={unit}
+          allowZero
           onChange={(value) => onChange({ thickness: value })}
         />
 

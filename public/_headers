@@ -1,0 +1,13 @@
+# Netlify response headers (copied into dist/ by Vite, so they also apply to a drag-and-drop deploy).
+# The app loads nothing from other origins: the PDF is made in the browser, exports are blob: URLs,
+# the project stays in localStorage. public/theme.js is a file rather than an inline script so that
+# script-src can stay 'self'.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# File names under assets/ contain a content hash, so they never change.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

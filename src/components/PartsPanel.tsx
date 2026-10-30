@@ -1,8 +1,7 @@
 import type { Part, Unit } from '../types';
-import { createPart } from '../lib/project';
-import { partColor } from '../lib/palette';
-import { UNITS } from '../lib/units';
-import { NumberCell } from './NumberField';
+import { MAX_QTY, createBlankPart, createPart } from '../lib/project';
+import { CountCell, LengthCell } from './NumberField';
+import { PartSwatch } from './PartSwatch';
 
 interface Props {
   parts: Part[];
@@ -13,8 +12,6 @@ interface Props {
 }
 
 export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationChange }: Props) {
-  const step = UNITS[unit].step;
-
   const update = (id: string, patch: Partial<Part>) => {
     onChange(parts.map((part) => (part.id === id ? { ...part, ...patch } : part)));
   };
@@ -25,7 +22,7 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
 
   const add = () => {
     const last = parts[parts.length - 1];
-    onChange([...parts, createPart(last ? last.width : 400, last ? last.height : 300, 1)]);
+    onChange([...parts, last ? createPart(last.width, last.height, 1) : createBlankPart(unit)]);
   };
 
   return (
@@ -69,41 +66,31 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
                   <tr key={part.id}>
                     <td>
                       <span className="d-inline-flex align-items-center gap-1">
-                        <span
-                          className="legend-dot"
-                          style={{
-                            background: partColor(index).fill,
-                            borderColor: partColor(index).stroke,
-                          }}
-                        />
+                        <PartSwatch index={index} />
                         {index + 1}
                       </span>
                     </td>
                     <td>
-                      <NumberCell
+                      <LengthCell
                         value={part.width}
-                        min={1}
-                        step={step}
+                        unit={unit}
                         ariaLabel={`Part ${index + 1} width`}
                         onChange={(value) => update(part.id, { width: value })}
                       />
                     </td>
                     <td>
-                      <NumberCell
+                      <LengthCell
                         value={part.height}
-                        min={1}
-                        step={step}
+                        unit={unit}
                         ariaLabel={`Part ${index + 1} height`}
                         onChange={(value) => update(part.id, { height: value })}
                       />
                     </td>
                     <td>
-                      <NumberCell
-                        integer
+                      <CountCell
                         value={part.qty}
                         min={1}
-                        max={2000}
-                        step={1}
+                        max={MAX_QTY}
                         ariaLabel={`Part ${index + 1} quantity`}
                         onChange={(value) => update(part.id, { qty: value })}
                       />
@@ -113,6 +100,7 @@ export function PartsPanel({ parts, unit, allowRotation, onChange, onRotationCha
                         type="button"
                         className="btn btn-sm btn-outline-danger"
                         title="Remove part"
+                        aria-label={`Remove part ${index + 1}`}
                         onClick={() => remove(part.id)}
                       >
                         <i className="bi bi-trash" />

@@ -1,15 +1,19 @@
-import type { Unit } from '../types';
-import { UNITS } from './units';
+import type { UnplacedPart, Unit } from '../types';
+import { MAX_PIECES, MAX_SHEETS } from './layout';
+import { formatLength } from './units';
 
 export { formatArea, formatLength, formatPercent } from './units';
 
+export const UNPLACED_REASONS: Record<UnplacedPart['reason'], string> = {
+  oversize: 'larger than the usable sheet area',
+  space: `over the ${MAX_SHEETS}-sheet limit`,
+  limit: `over the ${MAX_PIECES}-piece limit`,
+};
+
 export function partSizeLabel(width: number, height: number, unit: Unit): string {
-  const decimals = UNITS[unit].decimals;
-  const w = Number(width.toFixed(decimals));
-  const h = Number(height.toFixed(decimals));
-  return `${w} × ${h}`;
+  return `${formatLength(width, unit)} × ${formatLength(height, unit)}`;
 }
 
-export function formatNumber(value: number, decimals = 2): string {
-  return Number(value.toFixed(decimals)).toString();
+export function pieceCount(count: number): string {
+  return `${count} ${count === 1 ? 'pc' : 'pcs'}`;
 }

@@ -36,19 +36,10 @@ function score(free: Rect, w: number, h: number, heuristic: Heuristic): [number,
 }
 
 export class MaxRectsBin {
-  readonly width: number;
-  readonly height: number;
   private free: Rect[];
 
   constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
     this.free = [{ x: 0, y: 0, w: width, h: height }];
-  }
-
-  fits(w: number, h: number, allowRotation: boolean): boolean {
-    if (w <= this.width + EPS && h <= this.height + EPS) return true;
-    return allowRotation && h <= this.width + EPS && w <= this.height + EPS;
   }
 
   insert(w: number, h: number, allowRotation: boolean, heuristic: Heuristic): Placement | null {

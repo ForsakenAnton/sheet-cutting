@@ -46,7 +46,7 @@ export interface SheetLayout {
 export interface UnplacedPart {
   partId: string;
   count: number;
-  reason: 'oversize' | 'space';
+  reason: 'oversize' | 'space' | 'limit';
 }
 
 export interface LayoutResult {

@@ -2,26 +2,184 @@
 <html lang="en" data-bs-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sheet Cutting Planner — free online cut list optimizer</title>
     <meta
       name="description"
-      content="Sheet cutting planner with nesting layout, cut list and export"
+      content="Plan cuts for plywood, MDF, chipboard, glass or metal sheets: enter the sheet and the parts, get an optimized layout with kerf, a cut list and PDF/SVG export. Free."
     />
-    <title>Sheet Cutting Planner</title>
-    <script>
-      (function () {
-        var stored = localStorage.getItem('sheet-cutting.theme');
-        var dark =
-          stored === 'dark' ||
-          ((stored === null || stored === 'auto') &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
-      })();
+    <link rel="canonical" href="https://sheet-cutting-planner.netlify.app/" />
+    <!-- Icons: .ico (16–48 px, what Google's favicon crawler takes most readily), SVG, iOS home screen. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Link previews (Telegram, social networks). The URLs must be absolute. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sheet Cutting Planner" />
+    <meta property="og:url" content="https://sheet-cutting-planner.netlify.app/" />
+    <meta property="og:title" content="Sheet Cutting Planner — free online cut list optimizer" />
+    <meta
+      property="og:description"
+      content="Enter a sheet and a list of parts, get an optimized cutting layout with kerf, a cut list and PDF/SVG export."
+    />
+    <meta property="og:image" content="https://sheet-cutting-planner.netlify.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Sheet Cutting Planner: a sheet with colored parts packed on it and the utilization"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- For search engines. Data blocks, not scripts: the CSP does not apply to them. -->
+    <!-- WebSite gives the site's name in results ("Sheet Cutting Planner", not the host's "Netlify"). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Sheet Cutting Planner",
+        "alternateName": "Sheet Cutting Planner — cut list optimizer",
+        "url": "https://sheet-cutting-planner.netlify.app/"
+      }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Sheet Cutting Planner",
+        "url": "https://sheet-cutting-planner.netlify.app/",
+        "description": "Free online cut list optimizer for plywood, MDF, chipboard, glass and metal sheets: optimized nesting layout with blade kerf and edge margin, cut list, PDF and SVG export.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "Anton", "url": "https://github.com/ForsakenAnton" }
+      }
+    </script>
+
+    <!-- Sets the color mode before the page is drawn (see public/theme.js). -->
+    <script src="/theme.js"></script>
+
+    <!-- What the page shows while the app loads (and what crawlers read before running scripts). -->
+    <style>
+      html[data-bs-theme='dark'] {
+        background: #212529;
+      }
+      body {
+        margin: 0;
+      }
+      .splash {
+        box-sizing: border-box;
+        min-height: 100vh;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font:
+          15px/1.5 system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        text-align: center;
+        color: #212529;
+        animation: splash-in 0.3s 0.5s both; /* a fast load never shows it */
+      }
+      .splash h1 {
+        margin: 6px 0 0;
+        font-size: 30px;
+      }
+      .splash p {
+        margin: 0;
+        max-width: 580px;
+        color: #6c757d;
+      }
+      .splash .tagline {
+        font-size: 18px;
+        color: inherit;
+      }
+      [data-bs-theme='dark'] .splash {
+        color: #dee2e6;
+      }
+      [data-bs-theme='dark'] .splash p {
+        color: #adb5bd;
+      }
+      [data-bs-theme='dark'] .splash .tagline {
+        color: inherit;
+      }
+      @keyframes splash-in {
+        from {
+          opacity: 0;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="splash">
+        <!-- The logo (public/favicon.svg). -->
+        <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="5" fill="#0d6efd" />
+          <rect
+            x="6"
+            y="7"
+            width="11"
+            height="9"
+            rx="1.5"
+            fill="#a8c7fa"
+            stroke="#e9f0ff"
+            stroke-width="1.2"
+          />
+          <rect
+            x="19"
+            y="7"
+            width="7"
+            height="9"
+            rx="1.5"
+            fill="#a9dfb5"
+            stroke="#e9f0ff"
+            stroke-width="1.2"
+          />
+          <rect
+            x="6"
+            y="18"
+            width="7"
+            height="7"
+            rx="1.5"
+            fill="#ffd08a"
+            stroke="#e9f0ff"
+            stroke-width="1.2"
+          />
+          <rect
+            x="15"
+            y="18"
+            width="11"
+            height="7"
+            rx="1.5"
+            fill="#f2a7a7"
+            stroke="#e9f0ff"
+            stroke-width="1.2"
+          />
+        </svg>
+        <h1>Sheet Cutting Planner</h1>
+        <p class="tagline">Free online cut list optimizer for sheet materials</p>
+        <p>
+          Enter a sheet size and a list of parts — plywood, MDF, chipboard, glass, metal — and get
+          an optimized cutting layout: blade kerf and edge margin, 90° rotation, several sheets when
+          the parts do not fit on one, a cut list with utilization and waste.
+        </p>
+        <p>
+          Export the plan to PDF or SVG, or print it. Millimetres, centimetres, metres or inches.
+          Free, works in your browser, no sign-up: the project stays on your device.
+        </p>
+        <noscript><p>Sheet Cutting Planner needs JavaScript.</p></noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

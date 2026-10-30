@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sheet-cutting-planner.netlify.app/sitemap.xml
